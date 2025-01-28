@@ -1,5 +1,7 @@
 Restaurante Pasion del INKA 
 
+admin - 12345
+
 ![Image](https://github.com/user-attachments/assets/76b07567-9a96-44e2-945c-a190c0b8c8a4)
 
 ![Image](https://github.com/user-attachments/assets/f40b902b-3e22-4d07-a47a-c8bf7527fe6c)
