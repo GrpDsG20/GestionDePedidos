@@ -121,26 +121,25 @@ if (isset($_GET['eliminar'])) {
         }
 
         table {
-            width: 90%;
+            width: 95%;
             margin: 30px auto;
             border-collapse: collapse;
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        th,
-        td {
-            padding: 15px;
+        th, td {
+            padding: 12px;
             border: 1px solid #ddd;
             text-align: center;
             font-weight: 300;
+            font-size: 0.9rem;
 
         }
-
         th {
             background-color: #000;
             color: white;
-
+            
         }
 
         tr:nth-child(even) {
@@ -149,12 +148,13 @@ if (isset($_GET['eliminar'])) {
 
         .btn-small {
             padding: 10px 15px;
-            font-size: 18px;
+            font-size: 0.9rem;
             font-family: 'Poppins', sans-serif;
+            margin: 2px;
         }
 
         #header-container {
-            width: 90%;
+            width: 95%;
             margin: 20px auto;
             display: flex;
             align-items: center;
@@ -250,7 +250,7 @@ if (isset($_GET['eliminar'])) {
                 <th>Nombre</th>
                 <th>Precio</th>
                 <th>Descripción</th>
-                <th>Acciones</th>
+                <th style="width:180px;">Acciones</th>
             </tr>
         </thead>
         <tbody>

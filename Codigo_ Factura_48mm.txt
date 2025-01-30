@@ -1,0 +1,110 @@
+ESTE CODIGO ES PARA FACTURAS DE 58MM 48MM
+SOLO REMPLAZA ESTA FUNCION DENTRO DE CARRITO.PHP
+
+  function imprimirFactura() {
+    const items = Array.from(document.querySelectorAll('tbody tr')).map(row => {
+        const cantidad = row.querySelector('input[type="number"]').value.padEnd(6); 
+        let producto = row.querySelector('td:first-child').innerText;
+
+        // Asegurar que el producto no exceda 20 caracteres y tenga un ancho fijo
+        if (producto.length > 20) {
+            producto = producto.substring(0, 17) + '...'; // Recortar y agregar "..."
+        }
+        producto = producto.padEnd(20);
+
+        const precioUnit = row.querySelector('td:nth-child(2)').innerText.replace('$', '').padStart(10);
+        const subtotal = row.querySelector('td[data-subtotal]').innerText.replace('$', '').padStart(10);
+        
+        return `${cantidad}${producto}${precioUnit}${subtotal}`;
+    });
+
+    const total = document.getElementById('total-general').innerText;
+    const numeroFactura = Math.floor(Math.random() * 1000000);
+
+    // Guardar la venta en la base de datos
+    fetch('guardar_venta.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ numero_comprobante: numeroFactura, total: total.replace('$', '').replace(',', '') })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exito) {
+            fetch('carrito.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accion: 'vaciar_carrito' })
+            }).then(() => {
+                alert('Venta confirmada con éxito');
+                window.location.href = 'carta.php';
+            }).catch(error => console.error('Error:', error));
+        } else {
+            alert('Error al registrar la venta');
+        }
+    }).catch(error => console.error('Error:', error));
+
+    // Formato de factura con ancho fijo en "Producto"
+    const facturaHTML = `
+<div id="factura-imprimir" style="width: 58mm; height: auto; margin: 0; padding: 2px; font-family: Arial, sans-serif; font-size: 7px; box-sizing: border-box;">
+    <h3 style="font-size: 15px; margin: 0; text-align: center;">PASION DEL INKA</h3>
+    <p style="font-size: 12px; margin: 1px 0; text-align: center;">Victoria 141, Villa Alemana - Valparaiso</p>
+    <p style="font-size: 12px; margin: 1px 0; text-align: center;">Tel: +56 959501542</p>
+    <p style="font-size: 12px; margin: 1px 0; text-align: center;">pasiondelinka3@gmail.com</p>
+    <p style="font-size: 12px; margin: 1px 0; text-align: center;">RUT: 25555555</p>
+    <hr style="border: none; border-top: 1px solid #000; margin: 5px 0;">
+    
+    <p style="font-size: 12px; margin: 1px 0; text-align: center;">Comprobante de pago #${numeroFactura}</p>
+    <p style="font-size: 12px; margin: 1px 0; text-align: center;">Fecha: ${new Date().toLocaleDateString()} Hora: ${new Date().toLocaleTimeString()}</p>
+    
+    <hr style="border: none; border-top: 1px solid #000; margin: 5px 0;">
+
+    <pre style="font-size: 9px; margin: 0; padding: 0; white-space: pre; text-align: left;">
+Cant.  Producto             P.Unit     Subtotal
+-----------------------------------------------
+${items.join('\n')}
+-----------------------------------------------
+Total:                                ${total}
+-----------------------------------------------
+    </pre>
+    
+    <p style="text-align: center; font-size: 12px; margin-top: 5px; margin-bottom: 2px;">¡Gracias por preferirnos!</p>
+    <p style="text-align: center; font-size: 12px; margin-top: 2px; margin-bottom: 5px;">Síguenos en Instagram @pasiondelinka_cl</p>
+</div>
+`;
+
+    // Crear una ventana temporal para impresión
+    const ventanaImpresion = window.open('', '', 'width=400,height=600');
+    ventanaImpresion.document.write(`
+    <html>
+        <head>
+            <style>
+                @media print {
+                    body {
+                        margin: 0;
+                        font-family: Arial, sans-serif;
+                        font-size: 12px;
+                    }
+                    #factura-imprimir {
+                        width: 58mm;
+                        height: auto;
+                        padding: 2px;
+                        box-sizing: border-box;
+                    }
+                    h3, p {
+                        margin: 0;
+                        text-align: center;
+                    }
+                    pre {
+                        font-family: monospace;
+                    }
+                }
+            </style>
+        </head>
+        <body>${facturaHTML}</body>
+    </html>
+`);
+    ventanaImpresion.document.close();
+    ventanaImpresion.focus();
+    ventanaImpresion.print();
+    ventanaImpresion.close();
+}
